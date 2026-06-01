@@ -656,6 +656,8 @@ files:
                 type: string
               - name: interval_seconds
                 type: integer
+              - name: timeout_seconds
+                type: integer
               - name: entity
                 type: object
                 required:

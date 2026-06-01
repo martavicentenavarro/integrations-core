@@ -20,6 +20,9 @@ EVENT_TRACK_TYPE = 'do-query-results'
 # Cap the number of rows fetched per query to prevent unbounded memory usage.
 MAX_RESULT_ROWS = 10_000
 
+# Fallback per-query statement timeout.
+DEFAULT_DO_QUERY_TIMEOUT_S = 60
+
 
 class PostgresDataObservability(DBMAsyncJob):
     def __init__(self, check: PostgreSql, config: InstanceConfig):
@@ -72,18 +75,24 @@ class PostgresDataObservability(DBMAsyncJob):
         try:
             if self._cancel_event.is_set():
                 raise Exception("Job loop cancelled. Aborting query.")
-            with conn.cursor() as cursor:
-                cursor.execute(query_spec.query)
-                # cursor.description is None when the query produced no result set
-                # (e.g. INSERT, UPDATE, DELETE, or a syntax error that executed without
-                # raising). RC-delivered queries must be SELECTs; treat this as a
-                # per-query error so subsequent queries in the list still run.
-                if cursor.description is None:
-                    raise psycopg.errors.ProgrammingError(
-                        "Query returned no result set — only SELECT statements are supported"
-                    )
-                columns = [desc[0] for desc in cursor.description]
-                rows = [list(row) for row in cursor.fetchmany(MAX_RESULT_ROWS)]
+            timeout_ms = (query_spec.timeout_seconds or DEFAULT_DO_QUERY_TIMEOUT_S) * 1000
+            # Pool connections run with autocommit=True, so SET LOCAL only takes
+            # effect inside an explicit transaction; it also reverts on commit,
+            # avoiding timeout leakage onto the shared connection.
+            with conn.transaction():
+                with conn.cursor() as cursor:
+                    cursor.execute("SET LOCAL statement_timeout = %s", (timeout_ms,))
+                    cursor.execute(query_spec.query)
+                    # cursor.description is None when the query produced no result set
+                    # (e.g. INSERT, UPDATE, DELETE, or a syntax error that executed without
+                    # raising). RC-delivered queries must be SELECTs; treat this as a
+                    # per-query error so subsequent queries in the list still run.
+                    if cursor.description is None:
+                        raise psycopg.errors.ProgrammingError(
+                            "Query returned no result set — only SELECT statements are supported"
+                        )
+                    columns = [desc[0] for desc in cursor.description]
+                    rows = [list(row) for row in cursor.fetchmany(MAX_RESULT_ROWS)]
             duration = time.time() - start
             return {
                 'status': 'success',
