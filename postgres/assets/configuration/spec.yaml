@@ -644,6 +644,7 @@ files:
                 - dbname
                 - query
                 - interval_seconds
+                - timeout_seconds
                 - entity
               properties:
               - name: monitor_id

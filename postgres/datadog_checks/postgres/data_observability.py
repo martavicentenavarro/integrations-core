@@ -20,15 +20,13 @@ EVENT_TRACK_TYPE = 'do-query-results'
 # Cap the number of rows fetched per query to prevent unbounded memory usage.
 MAX_RESULT_ROWS = 10_000
 
-# Fallback per-query statement timeout.
-DEFAULT_DO_QUERY_TIMEOUT_S = 60
-
 
 class PostgresDataObservability(DBMAsyncJob):
     def __init__(self, check: PostgreSql, config: InstanceConfig):
         self._check = check
         self._config = config
         self._last_execution: dict[int, float] = {}
+        self._loaded_config_id: str | None = None
         collection_interval = config.data_observability.collection_interval or 10
         super(PostgresDataObservability, self).__init__(
             check,
@@ -50,6 +48,14 @@ class PostgresDataObservability(DBMAsyncJob):
 
     def _get_due_queries(self) -> list[Query]:
         queries = self._do_config.queries or ()
+        config_id = self._do_config.config_id
+
+        # When config_id changes (new RC payload), reset scheduling so all queries
+        # run immediately rather than waiting for the first interval to elapse.
+        if config_id != self._loaded_config_id:
+            self._loaded_config_id = config_id
+            self._last_execution.clear()
+
         now = time.time()
         due = []
         for q in queries:
@@ -75,7 +81,7 @@ class PostgresDataObservability(DBMAsyncJob):
         try:
             if self._cancel_event.is_set():
                 raise Exception("Job loop cancelled. Aborting query.")
-            timeout_ms = (query_spec.timeout_seconds or DEFAULT_DO_QUERY_TIMEOUT_S) * 1000
+            timeout_ms = query_spec.timeout_seconds * 1000
             # Pool connections run with autocommit=True, so SET LOCAL only takes
             # effect inside an explicit transaction; it also reverts on commit,
             # avoiding timeout leakage onto the shared connection.
