@@ -644,7 +644,7 @@ files:
                 - dbname
                 - query
                 - interval_seconds
-                - timeout_seconds
+                - query_timeout
                 - entity
               properties:
               - name: monitor_id
@@ -657,7 +657,7 @@ files:
                 type: string
               - name: interval_seconds
                 type: integer
-              - name: timeout_seconds
+              - name: query_timeout
                 type: integer
               - name: entity
                 type: object
