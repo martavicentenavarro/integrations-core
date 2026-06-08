@@ -26,7 +26,6 @@ class PostgresDataObservability(DBMAsyncJob):
         self._check = check
         self._config = config
         self._last_execution: dict[int, float] = {}
-        self._loaded_config_id: str | None = None
         collection_interval = config.data_observability.collection_interval or 10
         super(PostgresDataObservability, self).__init__(
             check,
@@ -48,14 +47,6 @@ class PostgresDataObservability(DBMAsyncJob):
 
     def _get_due_queries(self) -> list[Query]:
         queries = self._do_config.queries or ()
-        config_id = self._do_config.config_id
-
-        # When config_id changes (new RC payload), reset scheduling so all queries
-        # run immediately rather than waiting for the first interval to elapse.
-        if config_id != self._loaded_config_id:
-            self._loaded_config_id = config_id
-            self._last_execution.clear()
-
         now = time.time()
         due = []
         for q in queries:
