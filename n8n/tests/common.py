@@ -211,5 +211,3 @@ def get_openmetrics_metadata_metrics(major: int = N8N_MAJOR, *, exclude_rare: bo
     for name in CHECK_LEVEL_METRIC_NAMES:
         metadata.pop(name, None)
     return metadata
-
-
