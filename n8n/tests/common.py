@@ -213,6 +213,3 @@ def get_openmetrics_metadata_metrics(major: int = N8N_MAJOR, *, exclude_rare: bo
     return metadata
 
 
-def get_metrics_from_metadata() -> dict:
-    """Metadata metrics suitable for the discovery E2E assertion."""
-    return get_metadata_metrics_for_version(exclude_rare=True)
