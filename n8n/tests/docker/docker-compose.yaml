@@ -76,6 +76,8 @@ services:
 
   n8n-worker:
     image: n8nio/n8n:${N8N_VERSION:-1.118.1}
+    labels:
+      com.datadoghq.ad.check.id: n8n-worker
     container_name: n8n-test-worker
     command: ["worker"]
     ports:

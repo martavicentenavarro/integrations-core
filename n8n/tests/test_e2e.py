@@ -8,6 +8,7 @@ import pytest
 from datadog_checks.dev.utils import assert_service_checks
 
 from . import common
+from .common import get_metrics_from_metadata
 
 
 @pytest.mark.e2e
@@ -27,3 +28,21 @@ def test_check_n8n_e2e(
         exclude=list(common.RARE_EVENT_METRIC_NAMES),
     )
     assert_service_checks(aggregator)
+
+
+@pytest.mark.e2e
+def test_e2e_discovery(dd_agent_check, discovery_config):
+    aggregator = dd_agent_check(
+        discovery_config,
+        check_rate=True,
+        discovery_min_instances=1,
+        discovery_timeout=30,
+    )
+
+    metadata_metrics = get_metrics_from_metadata()
+
+    aggregator.assert_metrics_using_metadata(
+        metadata_metrics,
+        check_submission_type=True,
+        check_symmetric_inclusion=True,
+    )

@@ -12,7 +12,7 @@ from typing import Any, Iterator
 import pytest
 import requests
 
-from datadog_checks.dev import docker_run
+from datadog_checks.dev import docker_run, get_e2e_discovery_config
 from datadog_checks.dev.conditions import CheckEndpoints, WaitFor
 
 from . import common
@@ -195,7 +195,8 @@ def dd_environment() -> Iterator[Any]:
                 },
             )
         else:
-            yield instances, common.E2E_METADATA
+            _, discovery_metadata = get_e2e_discovery_config()
+            yield instances, discovery_metadata
 
 
 @pytest.fixture
@@ -206,3 +207,8 @@ def instance() -> dict[str, Any]:
 @pytest.fixture
 def worker_instance() -> dict[str, Any]:
     return copy.deepcopy(common.WORKER_INSTANCE)
+
+
+@pytest.fixture
+def discovery_config():
+    return get_e2e_discovery_config()[0]
