@@ -1,6 +1,5 @@
 ad_identifiers:
   - n8n
-  - n8n-worker
 discovery: {}
 init_config:
 instances: []

@@ -4,12 +4,10 @@ files:
   discovery:
     ad_identifiers:
       - n8n
-      - n8n-worker
     strategies:
       - strategy: from_ports
         port_hints:
           - 5678
-          - 5680
         candidates:
           - openmetrics_endpoint: "http://{service.host}:{port.number}/metrics"
   options:

@@ -34,7 +34,7 @@ def test_e2e_discovery(dd_agent_check, discovery_config):
     aggregator = dd_agent_check(
         discovery_config,
         check_rate=True,
-        discovery_min_instances=2,
+        discovery_min_instances=1,
         discovery_timeout=30,
     )
 

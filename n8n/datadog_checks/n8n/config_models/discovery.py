@@ -15,7 +15,7 @@ from datadog_checks.base.utils.discovery import Service, from_ports
 
 def candidates(service: Service) -> Iterator[dict[str, Any]]:
     # discovery[0]: from_ports
-    for ctx in from_ports(service, port_hints=[5678, 5680]):
+    for ctx in from_ports(service, port_hints=[5678]):
         yield {
             'init_config': {},
             'instances': [
