@@ -3,6 +3,7 @@
 # Licensed under a 3-clause BSD style license (see LICENSE)
 import os
 
+from datadog_checks.base import is_affirmative
 from datadog_checks.dev import get_docker_hostname
 from datadog_checks.dev.utils import find_free_ports, get_metadata_metrics
 
@@ -28,6 +29,8 @@ else:
 
 N8N_VERSION = os.environ.get('N8N_VERSION', '1.118.1')
 N8N_MAJOR = int(N8N_VERSION.split('.', 1)[0])
+AUTODISCOVERY = is_affirmative(os.environ.get('N8N_AUTODISCOVERY', 'false'))
+AUTODISCOVERY_COMPOSE_PATH = os.path.join(HERE, 'docker', 'autodiscovery-default.compose')
 
 # Submitted by the check itself, not by the OpenMetrics scrape.
 CHECK_LEVEL_METRIC_NAMES = frozenset({'n8n.readiness.check'})

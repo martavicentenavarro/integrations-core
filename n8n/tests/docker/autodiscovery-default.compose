@@ -1,0 +1,30 @@
+services:
+  n8n:
+    image: n8nio/n8n:${N8N_VERSION:-1.118.1}
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_ENCRYPTION_KEY=test-encryption-key-not-a-secret
+      - N8N_HOST=0.0.0.0
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=admin
+      - N8N_BASIC_AUTH_PASSWORD=admin
+      - N8N_DIAGNOSTICS_ENABLED=false
+      - N8N_VERSION_NOTIFICATIONS_ENABLED=false
+      - N8N_TEMPLATES_ENABLED=false
+      - N8N_RUNNERS_ENABLED=false
+      - N8N_METRICS=true
+      - N8N_METRICS_INCLUDE_DEFAULT_METRICS=true
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:5678/healthz || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 15
+      start_period: 30s
+    networks:
+      - network1
+networks:
+  network1:
+    name: autodiscovery-default_default
