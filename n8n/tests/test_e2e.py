@@ -32,13 +32,8 @@ def test_check_n8n_e2e(
 
 
 @pytest.mark.e2e
-def test_e2e_discovery(dd_agent_check, discovery_config):
-    aggregator = dd_agent_check(
-        discovery_config,
-        check_rate=True,
-        discovery_min_instances=1,
-        discovery_timeout=30,
-    )
+def test_e2e_discovery(dd_agent_check_discovery):
+    aggregator = dd_agent_check_discovery(check_rate=True)
 
     aggregator.assert_metrics_using_metadata(
         common.get_metadata_metrics_for_version(exclude_rare=True),

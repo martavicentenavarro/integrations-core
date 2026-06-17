@@ -12,12 +12,10 @@ from typing import Any, Iterator
 import pytest
 import requests
 
-from datadog_checks.dev import docker_run, get_e2e_discovery_config
+from datadog_checks.dev import docker_run, get_e2e_discovery_metadata
 from datadog_checks.dev.conditions import CheckEndpoints, WaitFor
 
 from . import common
-
-_AUTO_CONF = Path(__file__).parent.parent / 'datadog_checks' / 'n8n' / 'data' / 'auto_conf.yaml'
 
 # Test webhook paths (only the test-fixture workflows expose these; the lab workflows
 # expose /webhook/lab/* paths and are exercised by the lab traffic generator instead).
@@ -154,18 +152,12 @@ def _workflow_started_non_zero() -> None:
 @pytest.fixture(scope='session')
 def dd_environment() -> Iterator[Any]:
     if common.AUTODISCOVERY:
-        e2e_metadata = {
-            'docker_volumes': [
-                '/var/run/docker.sock:/var/run/docker.sock:ro',
-                f'{_AUTO_CONF}:/etc/datadog-agent/conf.d/n8n.d/auto_conf.yaml:ro',
-            ],
-        }
         with docker_run(
             common.AUTODISCOVERY_COMPOSE_PATH,
             env_vars={'N8N_VERSION': common.N8N_VERSION},
             conditions=[CheckEndpoints(f'http://{common.HOST}:5678/metrics', attempts=60, wait=5)],
         ):
-            yield None, e2e_metadata
+            yield None, get_e2e_discovery_metadata()
         return
 
     conditions: list[Any] = [
@@ -212,8 +204,7 @@ def dd_environment() -> Iterator[Any]:
                 },
             )
         else:
-            _, discovery_metadata = get_e2e_discovery_config()
-            yield instances, discovery_metadata
+            yield instances, get_e2e_discovery_metadata()
 
 
 @pytest.fixture
@@ -224,8 +215,3 @@ def instance() -> dict[str, Any]:
 @pytest.fixture
 def worker_instance() -> dict[str, Any]:
     return copy.deepcopy(common.WORKER_INSTANCE)
-
-
-@pytest.fixture
-def discovery_config():
-    return get_e2e_discovery_config()[0]
