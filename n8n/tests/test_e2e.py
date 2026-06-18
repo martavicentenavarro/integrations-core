@@ -33,14 +33,11 @@ def test_check_n8n_e2e(
 def test_e2e_discovery(dd_agent_check_discovery):
     aggregator = dd_agent_check_discovery(check_rate=True)
 
-    metadata = {
-        k: v
-        for k, v in common.get_metadata_metrics_for_version(exclude_rare=True).items()
-        if k not in common.QUEUE_WORKER_METRIC_NAMES
-    }
+    # Discovery only scrapes the main n8n node; many metrics (worker, queue, workflow
+    # execution) are only available from the worker process. Check only that what IS
+    # submitted matches metadata.csv — not that all metadata metrics are submitted.
     aggregator.assert_metrics_using_metadata(
-        metadata,
+        common.get_metadata_metrics_for_version(exclude_rare=True),
         check_submission_type=True,
-        check_symmetric_inclusion=True,
-        exclude=list(common.RARE_EVENT_METRIC_NAMES),
+        check_symmetric_inclusion=False,
     )
