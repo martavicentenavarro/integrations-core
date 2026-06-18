@@ -1,7 +1,5 @@
 ad_identifiers:
   - n8n
+discovery: {}
 init_config:
-instances:
-  - openmetrics_endpoint: http://%%host%%:5678/metrics
-    tags:
-      - n8n_process:main
+instances: []
