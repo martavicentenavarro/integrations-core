@@ -6,6 +6,7 @@ from typing import Any, Callable
 import pytest
 
 from datadog_checks.dev.utils import assert_service_checks
+from datadog_checks.n8n import N8nCheck
 
 from . import common
 
@@ -43,3 +44,4 @@ def test_e2e_discovery(dd_agent_check_discovery):
         check_symmetric_inclusion=False,
         exclude=list(common.RARE_EVENT_METRIC_NAMES),
     )
+    aggregator.assert_service_check('n8n.openmetrics.health', status=N8nCheck.OK)
