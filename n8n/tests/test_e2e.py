@@ -39,5 +39,5 @@ def test_e2e_discovery(dd_agent_check_discovery):
         common.get_metadata_metrics_for_version(exclude_rare=True),
         check_submission_type=True,
         check_symmetric_inclusion=True,
-        exclude=list(common.RARE_EVENT_METRIC_NAMES),
+        exclude=list(common.RARE_EVENT_METRIC_NAMES | common.QUEUE_WORKER_METRIC_NAMES),
     )

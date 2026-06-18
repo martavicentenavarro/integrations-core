@@ -162,6 +162,16 @@ RARE_EVENT_METRIC_NAMES = frozenset(
     }
 )
 
+# Metrics only emitted by the queue worker process, not by the main n8n process.
+# Discovery finds only the main node (port 5678), so these never appear in discovery runs.
+QUEUE_WORKER_METRIC_NAMES = frozenset(
+    {
+        'n8n.node.finished.count',
+        'n8n.node.started.count',
+        'n8n.queue.job.dequeued.count',
+    }
+)
+
 MAIN_INSTANCE = {
     'openmetrics_endpoint': f'http://{HOST}:{MAIN_PORT}/metrics',
     'tags': ['n8n_process:main'],
