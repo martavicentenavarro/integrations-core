@@ -33,9 +33,14 @@ def test_check_n8n_e2e(
 def test_e2e_discovery(dd_agent_check_discovery):
     aggregator = dd_agent_check_discovery(check_rate=True)
 
+    metadata = {
+        k: v
+        for k, v in common.get_metadata_metrics_for_version(exclude_rare=True).items()
+        if k not in common.QUEUE_WORKER_METRIC_NAMES
+    }
     aggregator.assert_metrics_using_metadata(
-        common.get_metadata_metrics_for_version(exclude_rare=True),
+        metadata,
         check_submission_type=True,
         check_symmetric_inclusion=True,
-        exclude=list(common.RARE_EVENT_METRIC_NAMES | common.QUEUE_WORKER_METRIC_NAMES),
+        exclude=list(common.RARE_EVENT_METRIC_NAMES),
     )
