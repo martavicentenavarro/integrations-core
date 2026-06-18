@@ -36,8 +36,10 @@ def test_e2e_discovery(dd_agent_check_discovery):
     # Discovery only scrapes the main n8n node; many metrics (worker, queue, workflow
     # execution) are only available from the worker process. Check only that what IS
     # submitted matches metadata.csv — not that all metadata metrics are submitted.
+    # exclude covers rare metrics that may or may not fire on the main node.
     aggregator.assert_metrics_using_metadata(
         common.get_metadata_metrics_for_version(exclude_rare=True),
         check_submission_type=True,
         check_symmetric_inclusion=False,
+        exclude=list(common.RARE_EVENT_METRIC_NAMES),
     )
