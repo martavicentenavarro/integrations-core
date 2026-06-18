@@ -151,15 +151,6 @@ def _workflow_started_non_zero() -> None:
 
 @pytest.fixture(scope='session')
 def dd_environment() -> Iterator[Any]:
-    if common.AUTODISCOVERY:
-        with docker_run(
-            common.AUTODISCOVERY_COMPOSE_PATH,
-            env_vars={'N8N_VERSION': common.N8N_VERSION},
-            conditions=[CheckEndpoints(f'http://{common.HOST}:5678/metrics', attempts=60, wait=5)],
-        ):
-            yield None, get_e2e_discovery_metadata()
-        return
-
     conditions: list[Any] = [
         # n8n main is booted and serving /metrics.
         CheckEndpoints(common.MAIN_INSTANCE['openmetrics_endpoint']),

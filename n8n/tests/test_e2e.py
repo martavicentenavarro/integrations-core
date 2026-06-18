@@ -9,8 +9,6 @@ from datadog_checks.dev.utils import assert_service_checks
 
 from . import common
 
-pytestmark = [pytest.mark.skipif(common.AUTODISCOVERY, reason='Not applicable in autodiscovery mode')]
-
 
 @pytest.mark.e2e
 def test_check_n8n_e2e(

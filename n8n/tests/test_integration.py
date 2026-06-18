@@ -11,11 +11,7 @@ from datadog_checks.n8n import N8nCheck
 
 from . import common
 
-pytestmark = [
-    pytest.mark.usefixtures('dd_environment'),
-    pytest.mark.integration,
-    pytest.mark.skipif(common.AUTODISCOVERY, reason='Integration tests require main+worker setup; not applicable in autodiscovery mode'),
-]
+pytestmark = [pytest.mark.usefixtures('dd_environment'), pytest.mark.integration]
 
 
 def _run_check_twice(instance: dict[str, Any], dd_run_check: Callable[[N8nCheck], Any]) -> N8nCheck:
