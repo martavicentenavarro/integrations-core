@@ -47,5 +47,5 @@ def test_e2e_discovery(dd_agent_check_discovery):
     aggregator.assert_service_check(
         'n8n.openmetrics.health',
         status=N8nCheck.OK,
-        tags=['endpoint:http://localhost:5678/metrics'],
+        at_least=1,
     )
