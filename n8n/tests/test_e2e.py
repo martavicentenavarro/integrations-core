@@ -44,4 +44,8 @@ def test_e2e_discovery(dd_agent_check_discovery):
         check_symmetric_inclusion=False,
         exclude=list(common.RARE_EVENT_METRIC_NAMES),
     )
-    aggregator.assert_service_check('n8n.openmetrics.health', status=N8nCheck.OK)
+    aggregator.assert_service_check(
+        'n8n.openmetrics.health',
+        status=N8nCheck.OK,
+        tags=['endpoint:http://localhost:5678/metrics'],
+    )
