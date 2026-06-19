@@ -450,6 +450,65 @@ def test_discovery_unknown_placeholder():
     ) in spec.errors
 
 
+def test_discovery_scalar_candidate_valid():
+    spec = get_spec(
+        """
+        version: 0.0.0
+        files:
+        - name: test.yaml
+          example_name: test.yaml.example
+          discovery:
+            ad_identifiers:
+            - test
+            strategies:
+            - strategy: from_ports
+              port_hints:
+              - 9090
+              candidates:
+              - openmetrics_endpoint: http://{service.host}:{port.number}/metrics
+                enable_feature: true
+          options:
+          - template: init_config
+          - template: instances
+        """
+    )
+    spec.load()
+
+    assert not spec.errors
+
+
+def test_discovery_scalar_candidate_invalid_type():
+    spec = get_spec(
+        """
+        version: 0.0.0
+        files:
+        - name: test.yaml
+          example_name: test.yaml.example
+          discovery:
+            ad_identifiers:
+            - test
+            strategies:
+            - strategy: from_ports
+              port_hints:
+              - 9090
+              candidates:
+              - openmetrics_endpoint: http://{service.host}:{port.number}/metrics
+                bad_field:
+                - item1
+                - item2
+          options:
+          - template: init_config
+          - template: instances
+        """
+    )
+    spec.load()
+
+    assert (
+        'test, test.yaml, discovery, strategy #1, candidate #1, bad_field: '
+        'Candidate values must be strings or scalar literals'
+    ) in spec.errors
+
+
 def test_section_not_map():
     spec = get_spec(
         """
