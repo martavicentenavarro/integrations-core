@@ -17,6 +17,15 @@ from .common import (
 )
 
 
+def test_e2e_discovery(dd_agent_check_discovery):
+    aggregator = dd_agent_check_discovery(check_rate=True)
+
+    aggregator.assert_metrics_using_metadata(
+        get_metadata_metrics(), check_submission_type=True, check_symmetric_inclusion=False
+    )
+    aggregator.assert_service_check('argocd.app_controller.openmetrics.health', status=ServiceCheck.OK)
+
+
 @pytest.mark.e2e
 def test_e2e_openmetrics_v1(dd_agent_check):
     aggregator = dd_agent_check(rate=True)
