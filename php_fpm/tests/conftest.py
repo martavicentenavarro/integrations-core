@@ -7,7 +7,7 @@ from copy import deepcopy
 
 import pytest
 
-from datadog_checks.dev import docker_run, get_docker_hostname
+from datadog_checks.dev import docker_run, get_docker_hostname, get_e2e_discovery_metadata
 from datadog_checks.php_fpm import PHPFPMCheck
 
 HOST = get_docker_hostname()
@@ -53,7 +53,7 @@ def ping_url_tag_fastcgi():
 @pytest.fixture(scope='session')
 def dd_environment():
     with docker_run(os.path.join(HERE, 'compose', 'docker-compose.yml'), endpoints='http://{}:8080'.format(HOST)):
-        yield DEFAULT_INSTANCE
+        yield DEFAULT_INSTANCE, get_e2e_discovery_metadata()
 
 
 @pytest.fixture
