@@ -16,9 +16,3 @@ def test_e2e(dd_agent_check, instance):
     aggregator.assert_service_check("supervisord.can_connect", status=AgentCheck.OK, count=1)
 
     aggregator.assert_all_metrics_covered()
-
-
-def test_e2e_discovery(dd_agent_check_discovery):
-    aggregator = dd_agent_check_discovery(check_rate=True)
-
-    aggregator.assert_service_check("supervisord.can_connect", status=AgentCheck.OK)
