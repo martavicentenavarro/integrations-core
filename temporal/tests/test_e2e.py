@@ -35,6 +35,7 @@ def test_e2e_discovery(dd_agent_check_discovery):
     aggregator = dd_agent_check_discovery(check_rate=True)
 
     aggregator.assert_metrics_using_metadata(get_metadata_metrics())
+    # tags=TAGS not asserted: the discovered endpoint tag uses the runtime container IP, not localhost:8000.
     aggregator.assert_service_check("temporal.server.openmetrics.health", status=TemporalCheck.OK)
 
 
